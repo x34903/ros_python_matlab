@@ -31,6 +31,10 @@ STEP 4: Adding a ROS Package.
 Alternative for those that are comfortable with creating ROS packages.
 
 STEP 5: Running the scripts
+- PUBLISH from Python
+- PUBLISH from Matlab
+- SUBSCRIBE, manipulate matrices, then PUBLISH from Matlab
+- SUBSCRIBE, manipulate matrices, then PUBLISH from Python
 
 
 
