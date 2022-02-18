@@ -9,6 +9,12 @@ Instructions for Matlab/Python talking to one another in ROS. This is a derivati
 *ASSUMES ROS IS ALREADY INSTALLED ON COMPUTER WITH NUMPY PACKAGE IN PYTHON
 
 
+Tutorial located at
+$  wget https://raw.github.com/x34903/ros_python_matlab/main/scripts/tutorial_ros_python_matlab.txt
+$ subl tutorial_ros_python_matlab.txt
+
+
+
 
 STEP 1: Creating a Catkin Workspace
 If you already have a Catkin Workspace, you can skip to (STEP 2).
@@ -54,13 +60,13 @@ $ source devel/setup.bash
 
 *Skip this step if you want to work in an existing ROS package.
 
-You can integrate into an existing ROS package (i.e. "beginner_tutorials") or start a new ROS package for this tutorial. I recommend starting a new package just for practice. Thus, we use "ROSpgk_python_matlab" instead of "beginner_tutorials" below.  
+You can integrate into an existing ROS package (i.e. "beginner_tutorials") or start a new ROS package for this tutorial. I recommend starting a new package just for practice. Thus, we use "ros_python_matlab" instead of "beginner_tutorials" below.  
 
 Extracts from
 http://wiki.ros.org/catkin/Tutorials/CreatingPackage
 
 $ cd ~/catkin_ws3/src
-$ catkin_create_pkg rospgk_yourname std_msgs rospy roscpp
+$ catkin_create_pkg ros_python_matlab std_msgs rospy roscpp
 $ cd ~/catkin_ws3
 $ catkin_make
 $ . ~/catkin_ws3/devel/setup.bash
@@ -72,7 +78,7 @@ $ . ~/catkin_ws3/devel/setup.bash
 We will use Python and Matlab scripts to talk to one another via ROS. First we need to download some that work.
 
 $ cd ~/catkin_ws3/src/rospkg_yourname/
-$ git clone https://github.com/x34903/ros_python_matlab.git scripts
+$ wget https://raw.github.com/x34903/ros_python_matlab/main/scripts.zip && unzip scripts.zip && rm scripts.zip
 $ cd scripts
 
 Take a look at the python and matlab scripts you just downloaded
@@ -85,7 +91,7 @@ http://wiki.ros.org/ROS/Tutorials/ExaminingPublisherSubscriber
 
 Now let's go back and edit CMakeLists.txt within your ROS package so it sees these scripts
 
-$ cd ~/catkin_ws3/src/rospkg_yourname/
+$ cd ~/catkin_ws3/src/ros_python_matlab/
 $ subl CMakeLists.txt
 
 Copy and past the following into the INSTALL section of CMakeLists.txt and save.
@@ -118,7 +124,8 @@ This version skips all of the ros package creation and just downloads a fully-co
 Assuming your workspace is called "catkin_ws3"
 
 $ cd ~/catkin_ws3/src/
-$ git clone https://github.com/x34903/ros_python_matlab.git scripts
+$ git clone https://github.com/x34903/ros_python_matlab.git
+$ catkin_create_pkg ros_python_matlab std_msgs rospy roscpp
 $ cd ~/catkin_ws3/
 $ catkin_make
 $ . ~/catkin_ws3/devel/setup.bash
@@ -133,23 +140,29 @@ Now you're ready to move to Step 5.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-Now you're ready to Try out these scripts. Ensure you use the proper rospackage:
+Now you're ready to Try out these scripts. 
 
-"rospkg_yourname" (if following Version A tutorial) 
-"ros_python_matlab" (if cloned using Version B tutorial) 
 
+---------------------
+START ROS ENVIRONMENT
 
 
 TERMINAL 1
 $ roscore
 
-For each subsequent terminal
-$ source /opt/ros/noetic/setup.bash
-$ source ~/catkin_ws3/devel/setup.bash
 
+In some terminal
 $ rostopic list
 /rosout
 /rosout_agg
+
+For each subsequent terminal
+$ cd ~/catkin_ws3
+$ source devel/setup.bash
+
+
+---------------------
+PUBLISH - PYTHON
 
 
 TERMINAL 2: Publish /Aflat_py
@@ -160,6 +173,9 @@ $ rostopic list (new items marked with *)
 /rosout
 /rosout_agg
 
+
+---------------------
+PUBLISH - MATLAB
 
 
 TERMINAL 3: Publish /Bflat_mat
@@ -176,6 +192,10 @@ $ rostopic list
 /rosout_agg
 
 
+---------------------
+SUBSCRIBE, MANIPULATE, THEN REPUBLISH - MATLAB
+
+
 TERMINAL 4: Subscribe /Aflat_py /Bflat_mat Publish Cflat_py Dflat_py
 Subscribe to python- and matlab-originated ROS messages, do matrix manipulation, and then publish
 $ rosrun ROSpgk_python_matlab python_sub_ops_pub.py
@@ -187,6 +207,10 @@ $ rostopic list
 /Dflat_py*
 /rosout
 /rosout_agg
+
+
+---------------------
+SUBSCRIBE, MANIPULATE, THEN REPUBLISH - PYTHON
 
 
 TERMINAL 5: Subscribe /Aflat_py /Bflat_mat Publish Cflat_mat Dflat_mat
@@ -205,6 +229,8 @@ $ rostopic list
 /Dflat_py
 /rosout
 /rosout_agg
+
+
 
 
 At this point, both Python and Matlab are pushing out the same data:
