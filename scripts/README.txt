@@ -207,12 +207,10 @@ $ rostopic list
 /rosout_agg
 
 
-
-
-At this point, both Python and Matlab are pushing out the same data
+At this point, both Python and Matlab are pushing out the same data:
 /Cflat_py.data = /Cflat_mat.data
 /Dflat_py.data = /Dflat_mat.data
 
-
+The frequency of publication may be different, which is something you can play around with.
 
 

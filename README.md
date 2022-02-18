@@ -1,2 +1,220 @@
 # ROS_python_matlab
 send basic messages between matlab and python
+
+ROS Tutorial - publishing and subscribing between Python and Matlab scripts
+
+Author: Steve Crews, 18 Feb 2022
+
+
+Instructions for Matlab/Python talking to one another in ROS. This is a derivative of the ROS Tutorials, so only do what is required.
+
+
+*ASSUMES ROS IS ALREADY INSTALLED ON COMPUTER WITH NUMPY PACKAGE IN PYTHON
+
+
+
+STEP 1: Creating a Catkin Workspace
+If you already have a Catkin Workspace, you can skip to (STEP 2).
+
+VERSION A: 
+STEPS 2-3: Creating a ROS Package and Adding some scripts
+If you already know this you can skip to (STEP 4). 
+
+VERSION B: 
+STEP 4: Adding a ROS Package.
+Alternative for those that are comfortable with creating ROS packages.
+
+STEP 5: Running the scripts
+
+
+-------------------------------------
+1. CREATING CATKIN WORKSPACE
+
+*Skip this step if you want to work in an existing catkin workspace.
+
+You can integrate into an existing catkin workspace (i.e. "catkin_ws") or start a new workspace for this tutorial. I recommend starting a new workspace just for practice. Thus, we use "catkin_ws3" instead of "catkin_ws" below.  
+
+Extracts from 
+http://wiki.ros.org/catkin/Tutorials/create_a_workspace
+
+$ source /opt/ros/noetic/setup.bash 
+$ mkdir -p ~/catkin_ws3/src
+$ cd ~/catkin_ws3/
+$ catkin_make
+$ source devel/setup.bash
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% VERSION A %%%%%%%%%%%%%%
+%% CREATING ROS PACKAGE FROM SCRATCH %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+-------------------------------------
+2. CREATING A ROS PACKAGE
+
+*Skip this step if you want to work in an existing ROS package.
+
+You can integrate into an existing ROS package (i.e. "beginner_tutorials") or start a new ROS package for this tutorial. I recommend starting a new package just for practice. Thus, we use "ROSpgk_python_matlab" instead of "beginner_tutorials" below.  
+
+Extracts from
+http://wiki.ros.org/catkin/Tutorials/CreatingPackage
+
+$ cd ~/catkin_ws3/src
+$ catkin_create_pkg rospgk_yourname std_msgs rospy roscpp
+$ cd ~/catkin_ws3
+$ catkin_make
+$ . ~/catkin_ws3/devel/setup.bash
+
+
+-------------------------------------
+3. ADDING SOME SCRIPTS
+
+We will use Python and Matlab scripts to talk to one another via ROS. First we need to download some that work.
+
+$ cd ~/catkin_ws3/src/rospkg_yourname/
+$ git clone https://github.com/x34903/ros_python_matlab.git scripts
+$ cd scripts
+
+Take a look at the python and matlab scripts you just downloaded
+$ ls
+
+Some of the Python scripts were developed using
+http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28python%29
+and
+http://wiki.ros.org/ROS/Tutorials/ExaminingPublisherSubscriber
+
+Now let's go back and edit CMakeLists.txt within your ROS package so it sees these scripts
+
+$ cd ~/catkin_ws3/src/rospkg_yourname/
+$ subl CMakeLists.txt
+
+Copy and past the following into the INSTALL section of CMakeLists.txt and save.
+
+catkin_install_python(PROGRAMS 
+  scripts/talker.py 
+  scripts/listener.py 
+  scripts/python_pub.py
+  scripts/python_sub_pub.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+Now ROS will see these files when it rebuilds the ROS environment.
+
+$ cd ~/catkin_ws3
+$ catkin_make
+
+
+Now you're ready to move to Step 5 (Skip Version B, Step 4). 
+It is likely valuable to try out Version B if you're not too comfortable in ROS.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% VERSION B %%%%%%%%%%%%%%%
+%% CLONE ROS PACKAGE AND TEST SCRIPTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This version skips all of the ros package creation and just downloads a fully-completed ROS package that is ready to test.
+
+Assuming your workspace is called "catkin_ws3"
+
+$ cd ~/catkin_ws3/src/
+$ git clone https://github.com/x34903/ros_python_matlab.git scripts
+$ cd ~/catkin_ws3/
+$ catkin_make
+$ . ~/catkin_ws3/devel/setup.bash
+
+Now you're ready to move to Step 5.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% VERSION B %%%%%%%%%%%%%%%
+%% CLONE ROS PACKAGE AND TEST SCRIPTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Now you're ready to Try out these scripts. Ensure you use the proper rospackage:
+
+"rospkg_yourname" (if following Version A tutorial) 
+"ros_python_matlab" (if cloned using Version B tutorial) 
+
+
+
+TERMINAL 1
+$ roscore
+
+For each subsequent terminal
+$ source /opt/ros/noetic/setup.bash
+$ source ~/catkin_ws3/devel/setup.bash
+
+$ rostopic list
+/rosout
+/rosout_agg
+
+
+TERMINAL 2: Publish /Aflat_py
+$ rosrun ros_python_matlab python_pub.py
+
+$ rostopic list (new items marked with *)
+/Aflat_py*
+/rosout
+/rosout_agg
+
+
+
+TERMINAL 3: Publish /Bflat_mat
+Start matlab instance for publishing
+$ matlab
+>> rosinit
+-run matlab_pub.m
+
+
+$ rostopic list
+/Aflat_py
+/Bflat_mat*
+/rosout
+/rosout_agg
+
+
+TERMINAL 4: Subscribe /Aflat_py /Bflat_mat Publish Cflat_py Dflat_py
+Subscribe to python- and matlab-originated ROS messages, do matrix manipulation, and then publish
+$ rosrun ROSpgk_python_matlab python_sub_ops_pub.py
+
+$ rostopic list
+/Aflat_py
+/Bflat_mat
+/Cflat_py*
+/Dflat_py*
+/rosout
+/rosout_agg
+
+
+TERMINAL 5: Subscribe /Aflat_py /Bflat_mat Publish Cflat_mat Dflat_mat
+Subscribe to python- and matlab-originated ROS messages, do matrix manipulation, and then publish
+Start matlab instance for publishing
+$ matlab
+>> rosinit
+-run matlab_sub_pub.m
+
+$ rostopic list 
+/Aflat_py
+/Bflat_mat
+/Cflat_mat*
+/Cflat_py
+/Dflat_mat*
+/Dflat_py
+/rosout
+/rosout_agg
+
+
+At this point, both Python and Matlab are pushing out the same data:
+/Cflat_py.data = /Cflat_mat.data
+/Dflat_py.data = /Dflat_mat.data
+
+The frequency of publication may be different, which is something you can play around with.
+
+
+
