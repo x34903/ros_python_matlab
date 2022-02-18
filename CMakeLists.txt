@@ -154,23 +154,13 @@ include_directories(
 ## Install ##
 #############
 
-catkin_install_python(PROGRAMS scripts/talker.py
+catkin_install_python(PROGRAMS 
+  scripts/talker.py 
+  scripts/listener.py 
+  scripts/python_pub.py
+  scripts/python_sub_pub.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-
-catkin_install_python(PROGRAMS scripts/python_pub.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-catkin_install_python(PROGRAMS scripts/python_sub_pub.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html

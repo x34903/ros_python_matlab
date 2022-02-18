@@ -10,6 +10,11 @@ Instructions for Matlab/Python talking to one another in ROS. This is a derivati
 
 
 TUTORIAL available in /scripts/tutorial.txt
+or 
+Tutorial located at
+$  wget https://raw.github.com/x34903/ros_python_matlab/main/scripts/tutorial_ros_python_matlab.txt
+$ subl tutorial_ros_python_matlab.txt
+
 
 
 STEP 1: Creating a Catkin Workspace
