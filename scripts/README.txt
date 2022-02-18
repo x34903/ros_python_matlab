@@ -1,9 +1,27 @@
+ROS Tutorial - publishing and subscribing between Python and Matlab scripts
+
+Author: Steve Crews, 18 Feb 2022
+
+
 Instructions for Matlab/Python talking to one another in ROS. This is a derivative of the ROS Tutorials, so only do what is required.
 
-Author: Steve Crews, 10 Feb 2022
+
+*ASSUMES ROS IS ALREADY INSTALLED ON COMPUTER WITH NUMPY PACKAGE IN PYTHON
 
 
-ASSUMES ROS IS ALREADY INSTALLED ON COMPUTER WITH NUMPY PACKAGE IN PYTHON
+
+STEP 1: Creating a Catkin Workspace
+If you already have a Catkin Workspace, you can skip to (STEP 2).
+
+VERSION A: 
+STEPS 2-3: Creating a ROS Package and Adding some scripts
+If you already know this you can skip to (STEP 4). 
+
+VERSION B: 
+STEP 4: Adding a ROS Package.
+Alternative for those that are comfortable with creating ROS packages.
+
+STEP 5: Running the scripts
 
 
 -------------------------------------
@@ -23,6 +41,14 @@ $ catkin_make
 $ source devel/setup.bash
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% VERSION A %%%%%%%%%%%%%%
+%% CREATING ROS PACKAGE FROM SCRATCH %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 -------------------------------------
 2. CREATING A ROS PACKAGE
 
@@ -34,7 +60,7 @@ Extracts from
 http://wiki.ros.org/catkin/Tutorials/CreatingPackage
 
 $ cd ~/catkin_ws3/src
-$ catkin_create_pkg ROSpgk_yourname std_msgs rospy roscpp
+$ catkin_create_pkg rospgk_yourname std_msgs rospy roscpp
 $ cd ~/catkin_ws3
 $ catkin_make
 $ . ~/catkin_ws3/devel/setup.bash
@@ -43,13 +69,74 @@ $ . ~/catkin_ws3/devel/setup.bash
 -------------------------------------
 3. ADDING SOME SCRIPTS
 
-We will use Python and Matlab scripts to talk to one another via ROS.
+We will use Python and Matlab scripts to talk to one another via ROS. First we need to download some that work.
 
-Python extracts from
+$ cd ~/catkin_ws3/src/rospkg_yourname/
+$ git clone https://github.com/x34903/ros_python_matlab.git scripts
+$ cd scripts
+
+Take a look at the python and matlab scripts you just downloaded
+$ ls
+
+Some of the Python scripts were developed using
 http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28python%29
 and
 http://wiki.ros.org/ROS/Tutorials/ExaminingPublisherSubscriber
 
+Now let's go back and edit CMakeLists.txt within your ROS package so it sees these scripts
+
+$ cd ~/catkin_ws3/src/rospkg_yourname/
+$ subl CMakeLists.txt
+
+Copy and past the following into the INSTALL section of CMakeLists.txt and save.
+
+catkin_install_python(PROGRAMS 
+  scripts/talker.py 
+  scripts/listener.py 
+  scripts/python_pub.py
+  scripts/python_sub_pub.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+Now ROS will see these files when it rebuilds the ROS environment.
+
+$ cd ~/catkin_ws3
+$ catkin_make
+
+
+Now you're ready to move to Step 5 (Skip Version B, Step 4). 
+It is likely valuable to try out Version B if you're not too comfortable in ROS.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% VERSION B %%%%%%%%%%%%%%%
+%% CLONE ROS PACKAGE AND TEST SCRIPTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This version skips all of the ros package creation and just downloads a fully-completed ROS package that is ready to test.
+
+Assuming your workspace is called "catkin_ws3"
+
+$ cd ~/catkin_ws3/src/
+$ git clone https://github.com/x34903/ros_python_matlab.git scripts
+$ cd ~/catkin_ws3/
+$ catkin_make
+$ . ~/catkin_ws3/devel/setup.bash
+
+Now you're ready to move to Step 5.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% VERSION B %%%%%%%%%%%%%%%
+%% CLONE ROS PACKAGE AND TEST SCRIPTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Now you're ready to Try out these scripts. Ensure you use the proper rospackage:
+
+"rospkg_yourname" (if following Version A tutorial) 
+"ros_python_matlab" (if cloned using Version B tutorial) 
 
 
 
@@ -58,7 +145,7 @@ $ roscore
 
 For each subsequent terminal
 $ source /opt/ros/noetic/setup.bash
-$ source devel/setup.bash
+$ source ~/catkin_ws3/devel/setup.bash
 
 $ rostopic list
 /rosout
@@ -66,7 +153,7 @@ $ rostopic list
 
 
 TERMINAL 2: Publish /Aflat_py
-$ rosrun ROSpgk_python_matlab python_pub.py
+$ rosrun ros_python_matlab python_pub.py
 
 $ rostopic list (new items marked with *)
 /Aflat_py*
